@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Generate HD wallpapers for iPhone, Android, and Desktop with your year progress tracker.">
+    <title>Life Calendar | Wallpaper Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Wallpaper Page Specific Styles */
+        .wallpaper-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-xl);
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .wallpaper-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .config-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            backdrop-filter: blur(10px);
+        }
+
+        .config-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+        }
+
+        .config-section {
+            margin-bottom: var(--space-lg);
+        }
+
+        .config-section h3 {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: var(--space-md);
+        }
+
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-sm);
+        }
+
+        .device-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-xs);
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all var(--transition-base);
+            color: var(--text-primary);
+            font-family: inherit;
+        }
+
+        .device-btn:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .device-btn.active {
+            border-color: var(--accent);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .device-btn svg {
+            width: 32px;
+            height: 32px;
+            color: var(--text-secondary);
+        }
+
+        .device-btn.active svg {
+            color: var(--accent);
+        }
+
+        .device-btn span {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+        }
+
+        .resolution-select {
+            width: 100%;
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .resolution-select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .preview-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            backdrop-filter: blur(10px);
+            text-align: center;
+        }
+
+        .preview-panel h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+        }
+
+        .preview-frame {
+            display: inline-block;
+            background: #000;
+            border-radius: 24px;
+            padding: 12px;
+            box-shadow: var(--shadow-lg);
+            margin-bottom: var(--space-lg);
+        }
+
+        .preview-frame.phone {
+            max-width: 220px;
+        }
+
+        .preview-frame.desktop {
+            max-width: 100%;
+            border-radius: 12px;
+        }
+
+        .preview-canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+        }
+
+        .preview-info {
+            display: flex;
+            justify-content: center;
+            gap: var(--space-lg);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+
+        .preview-stat {
+            text-align: center;
+        }
+
+        .preview-stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .preview-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .download-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-md);
+        }
+
+        .btn-download {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-sm);
+            padding: var(--space-md) var(--space-lg);
+            background: var(--accent);
+            color: #FFFFFF;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all var(--transition-base);
+        }
+
+        .btn-download:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .btn-download svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .url-section {
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+        }
+
+        .url-section label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: var(--space-xs);
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: var(--space-sm);
+        }
+
+        .url-input {
+            flex: 1;
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            font-family: monospace;
+        }
+
+        .btn-copy {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .btn-copy:hover {
+            background: var(--accent);
+        }
+
+        /* Auto-Update Section */
+        .auto-update-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-xl);
+            padding: var(--space-xl);
+            margin-top: var(--space-xl);
+            backdrop-filter: blur(10px);
+        }
+
+        .auto-update-section h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: var(--space-lg);
+        }
+
+        .platform-tabs {
+            display: flex;
+            gap: var(--space-sm);
+            margin-bottom: var(--space-lg);
+            flex-wrap: wrap;
+        }
+
+        .platform-tab {
+            padding: var(--space-sm) var(--space-md);
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            font-family: inherit;
+            font-size: 0.9rem;
+        }
+
+        .platform-tab:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .platform-tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #FFFFFF;
+        }
+
+        .platform-content {
+            display: none;
+        }
+
+        .platform-content.active {
+            display: block;
+        }
+
+        .step-list {
+            list-style: none;
+            counter-reset: step;
+        }
+
+        .step-list li {
+            counter-increment: step;
+            padding: var(--space-md);
+            background: var(--bg-secondary);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-sm);
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .step-list li::before {
+            content: counter(step);
+            position: absolute;
+            left: var(--space-md);
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 24px;
+            background: var(--accent);
+            border-radius: var(--radius-full);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .step-list li strong {
+            color: var(--accent);
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-sm);
+            padding: var(--space-md);
+            margin-top: var(--space-sm);
+            font-family: monospace;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            color: var(--text-secondary);
+        }
+
+        .back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            color: var(--text-secondary);
+            text-decoration: none;
+            margin-bottom: var(--space-lg);
+            transition: color var(--transition-fast);
+        }
+
+        .back-link:hover {
+            color: var(--accent);
+        }
+
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated Background -->
+    <canvas id="particles-canvas"></canvas>
+
+    <div class="container">
+        <!-- Back Link -->
+        <a href="index.html" class="back-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
+            Back to Calendar
+        </a>
+
+        <!-- Header -->
+        <header class="header" style="padding-top: var(--space-md);">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <path d="M3 9h18M9 21V9" />
+                    </svg>
+                </div>
+                <h1>Wallpaper Generator</h1>
+            </div>
+            <p class="tagline">Create HD wallpapers for any device</p>
+        </header>
+
+        <!-- Main Content -->
+        <div class="wallpaper-container">
+            <!-- Configuration Panel -->
+            <div class="config-panel">
+                <h2>⚙️ Configuration</h2>
+
+                <!-- Device Selection -->
+                <div class="config-section">
+                    <h3>Device Type</h3>
+                    <div class="device-grid">
+                        <button class="device-btn active" data-device="phone" id="btn-phone">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="5" y="2" width="14" height="20" rx="2" />
+                                <line x1="12" y1="18" x2="12" y2="18" />
+                            </svg>
+                            <span>Phone</span>
+                        </button>
+                        <button class="device-btn" data-device="desktop" id="btn-desktop">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="2" y="3" width="20" height="14" rx="2" />
+                                <line x1="8" y1="21" x2="16" y2="21" />
+                                <line x1="12" y1="17" x2="12" y2="21" />
+                            </svg>
+                            <span>Desktop</span>
+                        </button>
+                        <button class="device-btn" data-device="tablet" id="btn-tablet">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="4" y="2" width="16" height="20" rx="2" />
+                                <line x1="12" y1="18" x2="12" y2="18" />
+                            </svg>
+                            <span>Tablet</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Resolution Selection -->
+                <div class="config-section">
+                    <h3>Resolution</h3>
+                    <select class="resolution-select" id="resolution-select">
+                        <optgroup label="iPhone">
+                            <option value="1290x2796" data-device="phone">iPhone 15 Pro Max (1290×2796)</option>
+                            <option value="1179x2556" data-device="phone">iPhone 15/14 Pro (1179×2556)</option>
+                            <option value="1170x2532" data-device="phone">iPhone 14/13 (1170×2532)</option>
+                        </optgroup>
+                        <optgroup label="Android">
+                            <option value="1080x2400" data-device="phone">Android Standard (1080×2400)</option>
+                            <option value="1440x3200" data-device="phone">Android Flagship (1440×3200)</option>
+                            <option value="1080x2340" data-device="phone">Android Compact (1080×2340)</option>
+                        </optgroup>
+                        <optgroup label="Desktop">
+                            <option value="1920x1080" data-device="desktop">Full HD (1920×1080)</option>
+                            <option value="2560x1440" data-device="desktop">2K QHD (2560×1440)</option>
+                            <option value="3840x2160" data-device="desktop">4K UHD (3840×2160)</option>
+                        </optgroup>
+                        <optgroup label="Tablet">
+                            <option value="2048x2732" data-device="tablet">iPad Pro 12.9" (2048×2732)</option>
+                            <option value="1640x2360" data-device="tablet">iPad Air (1640×2360)</option>
+                        </optgroup>
+                    </select>
+                </div>
+
+                <!-- Theme Selection -->
+                <div class="config-section">
+                    <h3>Color Theme</h3>
+                    <div class="theme-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <button class="theme-btn active" data-theme="midnight" title="Midnight Black">
+                            <span class="theme-preview midnight"></span>
+                            <span class="theme-name">Midnight</span>
+                        </button>
+                        <button class="theme-btn" data-theme="purple" title="Deep Purple">
+                            <span class="theme-preview purple"></span>
+                            <span class="theme-name">Purple</span>
+                        </button>
+                        <button class="theme-btn" data-theme="ocean" title="Ocean Blue">
+                            <span class="theme-preview ocean"></span>
+                            <span class="theme-name">Ocean</span>
+                        </button>
+                        <button class="theme-btn" data-theme="matrix" title="Matrix Green">
+                            <span class="theme-preview matrix"></span>
+                            <span class="theme-name">Matrix</span>
+                        </button>
+                        <button class="theme-btn" data-theme="ruby" title="Ruby Red">
+                            <span class="theme-preview ruby"></span>
+                            <span class="theme-name">Ruby</span>
+                        </button>
+                        <button class="theme-btn" data-theme="sunset" title="Sunset Orange">
+                            <span class="theme-preview sunset"></span>
+                            <span class="theme-name">Sunset</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <h2>📱 Preview</h2>
+
+                <div class="preview-frame phone" id="preview-frame">
+                    <canvas id="preview-canvas" class="preview-canvas"></canvas>
+                </div>
+
+                <div class="preview-info">
+                    <div class="preview-stat">
+                        <div class="preview-stat-value" id="preview-resolution">1290×2796</div>
+                        <div class="preview-stat-label">Resolution</div>
+                    </div>
+                    <div class="preview-stat">
+                        <div class="preview-stat-value" id="preview-day">Day 15</div>
+                        <div class="preview-stat-label">Progress</div>
+                    </div>
+                    <div class="preview-stat">
+                        <div class="preview-stat-value" id="preview-theme">Midnight</div>
+                        <div class="preview-stat-label">Theme</div>
+                    </div>
+                </div>
+
+                <div class="download-section">
+                    <button class="btn-download" id="download-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" />
+                            <polyline points="7,10 12,15 17,10" />
+                            <line x1="12" y1="15" x2="12" y2="3" />
+                        </svg>
+                        Download HD Wallpaper
+                    </button>
+
+                    <div class="url-section">
+                        <label>Direct Image URL (for automation)</label>
+                        <div class="url-input-group">
+                            <input type="text" class="url-input" id="image-url" readonly value="Deploy to get URL">
+                            <button class="btn-copy" id="copy-url" title="Copy URL">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                    height="16">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" />
+                                    <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Auto-Update Instructions -->
+        <section class="auto-update-section">
+            <h2>🔄 Auto-Update Setup</h2>
+            <p style="color: var(--text-secondary); margin-bottom: var(--space-lg);">
+                Set up your wallpaper to update automatically every day showing your latest progress.
+            </p>
+
+            <div class="platform-tabs">
+                <button class="platform-tab active" data-platform="ios">📱 iPhone (iOS)</button>
+                <button class="platform-tab" data-platform="android">🤖 Android</button>
+                <button class="platform-tab" data-platform="macos">🍎 macOS</button>
+                <button class="platform-tab" data-platform="windows">🪟 Windows</button>
+            </div>
+
+            <!-- iOS Instructions -->
+            <div class="platform-content active" id="ios-content">
+                <ol class="step-list">
+                    <li><strong>Deploy this app</strong> to Vercel or Netlify (free hosting)</li>
+                    <li>Open the <strong>Shortcuts</strong> app on your iPhone</li>
+                    <li>Create a new shortcut with these actions:
+                        <div class="code-block">
+                            1. Get Contents of URL: [your-site]/api/wallpaper.png<br>
+                            2. Set Wallpaper (choose Lock Screen)
+                        </div>
+                    </li>
+                    <li>Go to <strong>Automation</strong> tab → Create Personal Automation</li>
+                    <li>Choose <strong>Time of Day</strong> → Set to 12:01 AM daily</li>
+                    <li>Add your shortcut as the action → Turn off "Ask Before Running"</li>
+                </ol>
+            </div>
+
+            <!-- Android Instructions -->
+            <div class="platform-content" id="android-content">
+                <ol class="step-list">
+                    <li><strong>Deploy this app</strong> to Vercel or Netlify</li>
+                    <li>Install <strong>Tasker</strong> from Play Store ($3.49) or use <strong>MacroDroid</strong>
+                        (free)</li>
+                    <li>Create a new Task:
+                        <div class="code-block">
+                            Action: HTTP Request<br>
+                            URL: [your-site]/api/wallpaper.png<br>
+                            Save to: /sdcard/wallpaper.png
+                        </div>
+                    </li>
+                    <li>Add action: <strong>Set Wallpaper</strong> → Select saved image</li>
+                    <li>Create a <strong>Time Profile</strong> → 12:01 AM daily</li>
+                    <li>Link the profile to your task</li>
+                </ol>
+                <p style="color: var(--text-muted); margin-top: var(--space-md); font-size: 0.9rem;">
+                    💡 <strong>Alternative:</strong> Use <strong>Muzei</strong> app with a custom source plugin for
+                    simpler setup.
+                </p>
+            </div>
+
+            <!-- macOS Instructions -->
+            <div class="platform-content" id="macos-content">
+                <ol class="step-list">
+                    <li><strong>Deploy this app</strong> or run locally</li>
+                    <li>Open <strong>Terminal</strong> and create a script:
+                        <div class="code-block">
+                            #!/bin/bash<br>
+                            curl -o ~/Pictures/life-calendar.png "[your-site]/api/wallpaper.png?device=desktop"<br>
+                            osascript -e 'tell application "System Events" to set picture of every desktop to
+                            "~/Pictures/life-calendar.png"'
+                        </div>
+                    </li>
+                    <li>Save as <code>update-wallpaper.sh</code> and make executable:
+                        <div class="code-block">chmod +x update-wallpaper.sh</div>
+                    </li>
+                    <li>Add to crontab: <code>crontab -e</code>
+                        <div class="code-block">1 0 * * * /path/to/update-wallpaper.sh</div>
+                    </li>
+                </ol>
+            </div>
+
+            <!-- Windows Instructions -->
+            <div class="platform-content" id="windows-content">
+                <ol class="step-list">
+                    <li><strong>Deploy this app</strong> or run locally</li>
+                    <li>Create a PowerShell script <code>update-wallpaper.ps1</code>:
+                        <div class="code-block">
+                            $url = "[your-site]/api/wallpaper.png?device=desktop"<br>
+                            $path = "$env:USERPROFILE\Pictures\life-calendar.png"<br>
+                            Invoke-WebRequest -Uri $url -OutFile $path<br>
+                            Add-Type -TypeDefinition @"<br>
+                            using System.Runtime.InteropServices;<br>
+                            public class Wallpaper {<br>
+                            &nbsp;&nbsp;[DllImport("user32.dll", CharSet=CharSet.Auto)]<br>
+                            &nbsp;&nbsp;public static extern int SystemParametersInfo(int uAction, int uParam, string
+                            lpvParam, int fuWinIni);<br>
+                            }<br>
+                            "@<br>
+                            [Wallpaper]::SystemParametersInfo(0x0014, 0, $path, 0x0001)
+                        </div>
+                    </li>
+                    <li>Open <strong>Task Scheduler</strong> → Create Basic Task</li>
+                    <li>Set trigger: Daily at 12:01 AM</li>
+                    <li>Action: Start a program → <code>powershell.exe -File "path\to\update-wallpaper.ps1"</code></li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ for productivity enthusiasts</p>
+        </footer>
+    </div>
+
+    <script src="wallpaper.js"></script>
+</body>
+
+</html>
